@@ -1,3 +1,2 @@
-# COEN-ELEC490
-<h1>Intersection Collision Prevention System</h1>
-<p>IntersectionSafe is a device that uses modern technology in order to prevent intersection collisions from happening. It will do so by calculating the speed of vehicles approaching an intersection and determining if they are able to stop in time for the red/yellow light. If the system determines they can’t, it will send an alarm to perpendicular traffic in order to warn the surrounding vehicles, cyclists and pedestrians of this infringement, ordering them to stop and not cross the intersection in the hopes of preventing the accident.</p>
+# vehicle-speed-detection-using-opencv-python
+xml file vehicle detection 

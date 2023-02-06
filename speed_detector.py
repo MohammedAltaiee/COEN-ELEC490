@@ -5,6 +5,7 @@ import dlib
 import time
 import math
 from gpiozero import LED
+from time import sleep
 
 main_led = LED(18)
 

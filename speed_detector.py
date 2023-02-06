@@ -9,7 +9,10 @@ import math
 carCascade = cv2.CascadeClassifier("vech.xml")
 
 #Video file capture
-video = cv2.VideoCapture("carsVideo.mp4")
+#video = cv2.VideoCapture("carsVideo.mp4")
+
+#capture with front camera
+video = cv2.VideoCapture(0)
 
 # Constant Declaration
 WIDTH =1280

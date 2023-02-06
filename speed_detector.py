@@ -4,15 +4,20 @@ import cv2
 import dlib
 import time
 import math
+from gpiozero import LED
+
+main_led = LED(18)
+
+main_led.off()
 
 #Classifier File
 carCascade = cv2.CascadeClassifier("vech.xml")
 
 #Video file capture
-#video = cv2.VideoCapture("carsVideo.mp4")
+video = cv2.VideoCapture("carsVideo.mp4")
 
 #capture with front camera
-video = cv2.VideoCapture(0)
+#video = cv2.VideoCapture(0)
 
 # Constant Declaration
 WIDTH =1280
@@ -30,12 +35,17 @@ def estimateSpeed(location1, location2):
 #tracking multiple objects
 def trackMultipleObjects():
     rectangleColor = (0, 255, 255)
+    collisionColor = (255,0,0)
     frameCounter = 0
     currentCarID = 0
     fps = 0
+    
+    Collision_Flag = 0
+    first_start_time = time.time()
 
     carTracker = {}
     carNumbers = {}
+    carTotal = {}
     carLocation1 = {}
     carLocation2 = {}
     speed = [None] * 1000
@@ -68,6 +78,15 @@ def trackMultipleObjects():
             carTracker.pop(carID, None)
             carLocation1.pop(carID, None)
             carLocation2.pop(carID, None)
+            
+            print("Number of cars right now: " + str(len(carTracker)))
+            print("Total number of cars: " + str(len(carTotal)))
+            end_time = time.time()
+            print("Time Elapsed: " + str(end_time - first_start_time))
+            hours_elapsed = (end_time - first_start_time)/3600
+            cars_per_hour = len(carTotal)/hours_elapsed
+            print("Cars per hour: " + str(cars_per_hour))
+            print("Cars per minute: " + str(cars_per_hour/60))
 
         
         if not (frameCounter % 10):
@@ -106,6 +125,7 @@ def trackMultipleObjects():
                     tracker.start_track(image, dlib.rectangle(x, y, x + w, y + h))
 
                     carTracker[currentCarID] = tracker
+                    carTotal[currentCarID] = tracker
                     carLocation1[currentCarID] = [x, y, w, h]
 
                     currentCarID = currentCarID + 1
@@ -139,7 +159,17 @@ def trackMultipleObjects():
                         speed[i] = estimateSpeed([x1, y1, w1, h1], [x1, y2, w2, h2])
 
                     if speed[i] != None and y1 >= 180:
-                        cv2.putText(resultImage, str(int(speed[i])) + "km/h", (int(x1 + w1/2), int(y1-5)), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 100) ,2)
+                        if speed[i] >=50:
+                            while speed[i] >= 50:
+                                main_led.on()
+                                Collision_Flag = 1
+                                print("WARNING COLLISION!!")
+                                #Here is where we will trigger the light as there might be a collision
+                                cv2.putText(resultImage, str(int(speed[i])) + "km/h", (int(x1 + w1/2), int(y1-5)), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255) ,2)
+                            Collision_Flag = 0
+                        else:
+                            cv2.putText(resultImage, str(int(speed[i])) + "km/h", (int(x1 + w1/2), int(y1-5)), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0) ,2)
+                            Collision_Flag = 0
 
         cv2.imshow('result', resultImage)
 
